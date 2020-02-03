@@ -1,0 +1,344 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key attr.name="value2" attr.type="long" for="node" id="d2" />
+  <key attr.name="value" attr.type="long" for="node" id="d1" />
+  <key attr.name="type" attr.type="long" for="node" id="d0" />
+  <graph edgedefault="undirected">
+    <node id="R3653">
+      <data key="d0">1</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="R9767">
+      <data key="d0">1</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="R9589">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R4999">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R9439">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R3735">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R5247">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R7889">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R6197">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="R4248">
+      <data key="d0">1</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="E3788">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="E7715">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="E5068">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="E1073">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">2</data>
+    </node>
+    <node id="E5820">
+      <data key="d0">0</data>
+      <data key="d1">1</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="E7035">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">2</data>
+    </node>
+    <node id="E7189">
+      <data key="d0">0</data>
+      <data key="d1">1</data>
+      <data key="d2">2</data>
+    </node>
+    <node id="E6610">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="E5609">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="E1246">
+      <data key="d0">0</data>
+      <data key="d1">0</data>
+      <data key="d2">2</data>
+    </node>
+    <node id="T9864">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T1588">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T2629">
+      <data key="d0">3</data>
+      <data key="d1">2</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T8296">
+      <data key="d0">3</data>
+      <data key="d1">1</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T5487">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T9682">
+      <data key="d0">3</data>
+      <data key="d1">2</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T2938">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T1012">
+      <data key="d0">3</data>
+      <data key="d1">1</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T9551">
+      <data key="d0">3</data>
+      <data key="d1">2</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="T4654">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">0</data>
+    </node>
+    <node id="D5141">
+      <data key="d0">2</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="D1955">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D6377">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D1645">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D5309">
+      <data key="d0">2</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="D2297">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D8633">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D7872">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D1092">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D8979">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D1750">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D8664">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D5950">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D9125">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D1029">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D2090">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D8724">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D6971">
+      <data key="d0">2</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="D3891">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D7645">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D3273">
+      <data key="d0">2</data>
+      <data key="d1">0</data>
+    </node>
+    <node id="D4683">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D1793">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D8980">
+      <data key="d0">2</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="D4571">
+      <data key="d0">2</data>
+      <data key="d1">1</data>
+    </node>
+    <node id="D6875">
+      <data key="d0">2</data>
+      <data key="d1">2</data>
+    </node>
+    <node id="T5883">
+      <data key="d0">3</data>
+      <data key="d1">0</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="T9638">
+      <data key="d0">3</data>
+      <data key="d1">1</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="T2598">
+      <data key="d0">3</data>
+      <data key="d1">2</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="T2467">
+      <data key="d0">3</data>
+      <data key="d1">2</data>
+      <data key="d2">1</data>
+    </node>
+    <node id="T7173">
+      <data key="d0">3</data>
+      <data key="d1">1</data>
+      <data key="d2">1</data>
+    </node>
+    <edge source="R3653" target="E1246" />
+    <edge source="R3653" target="E5609" />
+    <edge source="R3653" target="D8979" />
+    <edge source="R3653" target="D3273" />
+    <edge source="R3653" target="D1029" />
+    <edge source="R3653" target="D8980" />
+    <edge source="R9767" target="E6610" />
+    <edge source="R9767" target="D6971" />
+    <edge source="R9767" target="D7645" />
+    <edge source="R9767" target="D1955" />
+    <edge source="R9767" target="D1750" />
+    <edge source="R9767" target="D1029" />
+    <edge source="R9767" target="D9125" />
+    <edge source="R9767" target="D2297" />
+    <edge source="R9767" target="D4683" />
+    <edge source="R9589" target="E7189" />
+    <edge source="R9589" target="E7035" />
+    <edge source="R9589" target="D8633" />
+    <edge source="R9589" target="D4571" />
+    <edge source="R9589" target="D5309" />
+    <edge source="R9589" target="D1645" />
+    <edge source="R4999" target="E5820" />
+    <edge source="R4999" target="E3788" />
+    <edge source="R4999" target="D4571" />
+    <edge source="R4999" target="D1092" />
+    <edge source="R4999" target="D1955" />
+    <edge source="R4999" target="D6377" />
+    <edge source="R4999" target="D5141" />
+    <edge source="R4999" target="D8980" />
+    <edge source="R9439" target="D1092" />
+    <edge source="R9439" target="D8724" />
+    <edge source="R9439" target="D9125" />
+    <edge source="R9439" target="D1793" />
+    <edge source="R3735" target="D6875" />
+    <edge source="R3735" target="D7872" />
+    <edge source="R3735" target="D2090" />
+    <edge source="R3735" target="D2297" />
+    <edge source="R3735" target="D8664" />
+    <edge source="R5247" target="E1073" />
+    <edge source="R5247" target="D8979" />
+    <edge source="R5247" target="D8724" />
+    <edge source="R5247" target="D8664" />
+    <edge source="R7889" target="D7872" />
+    <edge source="R7889" target="D8633" />
+    <edge source="R7889" target="D5950" />
+    <edge source="R7889" target="D3891" />
+    <edge source="R7889" target="D4683" />
+    <edge source="R7889" target="D1793" />
+    <edge source="R6197" target="E5068" />
+    <edge source="R6197" target="E7715" />
+    <edge source="R6197" target="D3273" />
+    <edge source="R6197" target="D6971" />
+    <edge source="R6197" target="D5141" />
+    <edge source="R4248" target="D7645" />
+    <edge source="R4248" target="D6875" />
+    <edge source="R4248" target="D5950" />
+    <edge source="R4248" target="D2090" />
+    <edge source="R4248" target="D6377" />
+    <edge source="R4248" target="D3891" />
+    <edge source="R4248" target="D5309" />
+    <edge source="R4248" target="D1750" />
+    <edge source="R4248" target="D1645" />
+    <edge source="D5141" target="T5883" />
+    <edge source="D5309" target="T9638" />
+    <edge source="D6971" target="T2598" />
+    <edge source="D8980" target="T2467" />
+    <edge source="D6875" target="T7173" />
+  </graph>
+</graphml>
