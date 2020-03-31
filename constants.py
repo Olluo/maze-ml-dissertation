@@ -1,76 +1,22 @@
-import random
-from collections import namedtuple
-from enum import IntEnum, auto
+LEVEL_DEPTH_LIMIT = 9  # This is the maximum distance in units that a room can be from the start room
+LEVEL_LAYOUT_DIMENSION = 2 * LEVEL_DEPTH_LIMIT + 1
+LEVEL_EDGE_INDICES = [0, LEVEL_LAYOUT_DIMENSION - 1]
+LEVEL_MAX_NUMBER_OF_ROOMS = LEVEL_LAYOUT_DIMENSION**2
 
+TREASURE_PROBABILITY = 0.1  # Probability of a room having a treasure in it
 
-class EntityType(IntEnum):
-    ENEMY = auto()
-    ROOM = auto()
-    DOOR = auto()
-    TREASURE = auto()
-    PLAYER = auto()
+ENEMY_PROBABILITY = 0.3  # Probability of a room having at least ENEMY_MIN_NUMBER_PER_ROOM in it
+ENEMY_MIN_NUMBER_PER_ROOM = 1  # The minimum number of enemies to spawn in a room if it is chosen to have an enemy in
+ENEMY_MAX_NUMBER_PER_ROOM = 3  # The maximum number of enemies to spawn in a room if it is chosen to have an enemy in
+ENEMY_ATTACK_TYPE_PROBABILITIES_WEAK = [0.4, 0.4, 0.2]
+ENEMY_ATTACK_TYPE_PROBABILITIES_STRONG = [0.2, 0.4, 0.4]
 
+# How much a good or bad event effects the patience of the player
+PLAYER_GOOD_EXPERIENCE_MULTIPLIER = 0.05
+PLAYER_BAD_EXPERIENCE_MULTIPLIER = 0.05
 
-class RoomType(IntEnum):
-    ENTRANCE = auto()
-    EXIT = auto()
-    # TREASURE = auto()
-    STANDARD = auto()
-    # CORRIDOR = auto()
+# The patience of the player to start (between 0 and 1)
+PLAYER_START_PATIENCE = 0.5
 
-
-class Direction(IntEnum):
-    NORTH = 0
-    SOUTH = 1
-    EAST = 2
-    WEST = 3
-
-    def opposite(self):
-        if self.value == Direction.NORTH:
-            return Direction.SOUTH
-        elif self.value == Direction.SOUTH:
-            return Direction.NORTH
-        elif self.value == Direction.EAST:
-            return Direction.WEST
-        elif self.value == Direction.WEST:
-            return Direction.EAST
-
-
-class ActionType(IntEnum):
-    START_LEVEL = auto()
-    END_LEVEL = auto()
-    ENTER_ROOM = auto()
-    EXIT_ROOM = auto()
-    SCAN_DOOR = auto()
-    KILL_ENEMY = auto()
-    SATISFACTION = auto()
-
-
-Action = namedtuple('Action', 'type, data')
-
-
-class DoorType(IntEnum):
-    ARCH = auto()
-    # CLOSED = auto()
-    # LOCKED = auto()
-    # TRAPPED = auto()
-    # SECRET = auto()
-    # STAIRS_UP = auto()
-    # STAIRS_DOWN = auto()
-    BARRICADE = auto()
-    ENTRANCE = auto()
-    EXIT = auto()
-
-    def draw(self, direction: Direction):
-        if self.value == DoorType.ARCH:
-            return '=' if (direction == direction.EAST or direction == direction.WEST) else '||'
-        elif self.value == DoorType.BARRICADE:
-            return '|' if (direction == direction.EAST or direction == direction.WEST) else '=='
-        elif self.value == DoorType.ENTRANCE:
-            return '*' if (direction == direction.EAST or direction == direction.WEST) else '**'
-        elif self.value == DoorType.EXIT:
-            return '&' if (direction == direction.EAST or direction == direction.WEST) else '&&'
-
-
-def generate_random_id(entity_type: EntityType):
-    return entity_type.name + str(random.randint(1000, 9999))
+NUMBER_LEVELS = 100
+NUMBER_PLAYERS = 100

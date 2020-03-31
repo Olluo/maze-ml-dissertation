@@ -1,152 +1,123 @@
-from abc import ABC, abstractmethod
-from math import sqrt
-from typing import List
+import random
+from statistics import mean, StatisticsError
+from typing import Optional, List, Tuple
 
 import networkx as nx
 
-from constants import RoomType, DoorType, generate_random_id, EntityType, Direction
+from constants import LEVEL_LAYOUT_DIMENSION, LEVEL_DEPTH_LIMIT, ENEMY_PROBABILITY, TREASURE_PROBABILITY, \
+    LEVEL_EDGE_INDICES, ENEMY_MIN_NUMBER_PER_ROOM, ENEMY_MAX_NUMBER_PER_ROOM, LEVEL_MAX_NUMBER_OF_ROOMS
+from door import DoorConfig
+from enemy import Enemy, EnemyType
+from room import Room, RoomType, BLANK_ROOM_ASCII
+from treasure import Treasure, TreasureValue
+from utils import Direction
 
 
-class Room:
-    def __init__(self, room_type: RoomType = RoomType.STANDARD, north_door=None, south_door=None, east_door=None,
-                 west_door=None, node_id: str = None):
-        self.node_type = EntityType.ROOM
-        self.north_door = [DoorType.BARRICADE, None] if north_door is None else north_door
-        self.south_door = [DoorType.BARRICADE, None] if south_door is None else south_door
-        self.east_door = [DoorType.BARRICADE, None] if east_door is None else east_door
-        self.west_door = [DoorType.BARRICADE, None] if west_door is None else west_door
-        self.room_type = room_type
-        self.node_id = node_id if node_id is not None else generate_random_id(self.node_type)
+class Level:
+    def __init__(self):
+        self.level_layout: List[List[Optional[Room]]] = [[None for _ in range(LEVEL_LAYOUT_DIMENSION)] for _ in
+                                                         range(LEVEL_LAYOUT_DIMENSION)]
+        self.rooms: List[Room] = []
+        self.treasures: List[Treasure] = []
+        self.enemies: List[Enemy] = []
 
-    def add_connection(self, direction: Direction, door_type: DoorType, connection_id):
-        if direction == Direction.NORTH:
-            self.north_door = [door_type, connection_id]
-        elif direction == Direction.SOUTH:
-            self.south_door = [door_type, connection_id]
-        elif direction == Direction.EAST:
-            self.east_door = [door_type, connection_id]
-        elif direction == Direction.WEST:
-            self.west_door = [door_type, connection_id]
+        self.start_room: Optional['Room'] = None
+        self.exit_room: Optional['Room'] = None
 
-    def add_entrance(self, direction: Direction):
-        self.add_connection(direction=direction, door_type=DoorType.ENTRANCE, connection_id=None)
+        self.generate_level()
 
-    def add_exit(self, direction: Direction):
-        self.add_connection(direction=direction, door_type=DoorType.EXIT, connection_id=None)
+    def generate_level(self):
+        self.start_room = Room(DoorConfig.start(), room_type=RoomType.ENTRANCE)
+        self.rooms.append(self.start_room)
 
-    @staticmethod
-    def from_dict(data):
-        return Room(room_type=data['room_type'],
-                    north_door=data['north_door'],
-                    south_door=data['south_door'],
-                    east_door=data['east_door'],
-                    west_door=data['west_door'],
-                    node_id=data['node_id']
-                    )
+        current_index = (LEVEL_DEPTH_LIMIT, LEVEL_DEPTH_LIMIT)
+        self.level_layout[current_index[0]][current_index[1]] = self.start_room
 
-    def to_dict(self):
-        return {'room_type': self.room_type,
-                'north_door': self.north_door,
-                'south_door': self.south_door,
-                'east_door': self.east_door,
-                'west_door': self.west_door,
-                'node_id': self.node_id
-                }
+        self.add_rooms(self.start_room, current_index)
 
-    def add_to_graph(self, graph: nx.Graph):
-        graph.add_node(self.node_id, type=int(EntityType.ROOM), value=int(self.room_type))
-        if self.north_door[0] in [DoorType.ARCH]:
-            graph.add_edge(self.node_id, self.north_door[1], type=int(self.north_door[0]))
-        elif self.north_door[0] in [DoorType.ENTRANCE, DoorType.EXIT]:
-            graph.add_edge(self.node_id, str(self.north_door[0].name), type=int(self.north_door[0]))
+        self.exit_room = self.rooms[-1]
+        self.exit_room.make_exit()
 
-        if self.south_door[0] in [DoorType.ARCH]:
-            graph.add_edge(self.node_id, self.south_door[1], type=int(self.south_door[0]))
-        elif self.south_door[0] in [DoorType.ENTRANCE, DoorType.EXIT]:
-            graph.add_edge(self.node_id, str(self.south_door[0].name), type=int(self.south_door[0]))
+    def add_rooms(self, room: Room, current_index, treasure_probability=TREASURE_PROBABILITY,
+                  enemy_probability=ENEMY_PROBABILITY):
+        x_index, y_index = current_index
+        new_x_index, new_y_index = x_index, y_index
 
-        if self.east_door[0] in [DoorType.ARCH]:
-            graph.add_edge(self.node_id, self.east_door[1], type=int(self.east_door[0]))
-        elif self.east_door[0] in [DoorType.ENTRANCE, DoorType.EXIT]:
-            graph.add_edge(self.node_id, str(self.east_door[0].name), type=int(self.east_door[0]))
+        connections_to_add: List[Direction] = room.unset_directions
 
-        if self.west_door[0] in [DoorType.ARCH]:
-            graph.add_edge(self.node_id, self.west_door[1], type=int(self.west_door[0]))
-        elif self.west_door[0] in [DoorType.ENTRANCE, DoorType.EXIT]:
-            graph.add_edge(self.node_id, str(self.west_door[0].name), type=int(self.west_door[0]))
+        new_rooms: List[Tuple[Room, Tuple[int, int]]] = []
+        for direction in connections_to_add:
+            door_config = DoorConfig.cap(direction)
 
-    @staticmethod
-    def connect_rooms(room1: 'Room', room2: 'Room', direction: Direction, door_type: DoorType):
-        room1.add_connection(direction, door_type, room2.node_id)
-        room2.add_connection(direction.opposite(), door_type, room1.node_id)
+            if direction == Direction.NORTH:
+                new_y_index -= 1
+            elif direction == Direction.SOUTH:
+                new_y_index += 1
+            elif direction == Direction.EAST:
+                new_x_index += 1
+            elif direction == Direction.WEST:
+                new_x_index -= 1
 
-    def draw(self, display=False):
-        room = [
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'N', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', '|', '-', '-', '-', '-', '-', '-', '|', '|', '-', '-', '-', '-', '-', '-', '|', ' '],
-            [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-            ['W', '=', ' ', ' ', ' ', 'R', 'O', 'O', 'M', '#', '#', '#', '#', ' ', ' ', ' ', '=', 'E'],
-            [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-            [' ', '|', '-', '-', '-', '-', '-', '-', '|', '|', '-', '-', '-', '-', '-', '-', '|', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        ]
-        room[0][8:10] = str(self.north_door[0].draw(Direction.NORTH))
-        room[-1][8:10] = str(self.south_door[0].draw(Direction.SOUTH))
-        room[3][0] = str(self.west_door[0].draw(Direction.WEST))
-        room[3][-1] = str(self.east_door[0].draw(Direction.EAST))
-        room[3][5:13] = list(self.node_id)
+            if new_x_index in LEVEL_EDGE_INDICES or new_y_index in LEVEL_EDGE_INDICES:
+                cap = True
+            else:
+                cap = False
 
-        if display:
-            for x in room:
-                print(x)
+            new_room = self.level_layout[new_y_index][new_x_index]
+            if new_room is None:
+                if cap:
+                    new_room = Room(door_config)
+                else:
+                    new_room = Room.random_room(direction)
 
-        return room
+                if random.random() < treasure_probability:
+                    treasure = Treasure.random_treasure()
+                    self.treasures.append(treasure)
+                    new_room.add_treasure(treasure)
+                    treasure_probability = TREASURE_PROBABILITY
+                else:
+                    treasure_probability += TREASURE_PROBABILITY
 
+                if random.random() < enemy_probability:
+                    number_of_enemies = random.randint(ENEMY_MIN_NUMBER_PER_ROOM, ENEMY_MAX_NUMBER_PER_ROOM)
+                    for _ in range(number_of_enemies):
+                        enemy = Enemy.random_enemy()
+                        self.enemies.append(enemy)
+                        new_room.add_enemy(enemy)
+                        enemy_probability = ENEMY_PROBABILITY
+                else:
+                    enemy_probability += ENEMY_PROBABILITY
 
-class AbstractLevel(ABC):
-    @abstractmethod
-    def to_file(self, file_name: str = "level.csv"):
-        pass
+                self.rooms.append(new_room)
 
-    @staticmethod
-    @abstractmethod
-    def from_file(file_name: str = "level.csv") -> 'AbstractLevel':
-        pass
+            self._add_connection(room, new_room, direction)
+            self.level_layout[new_y_index][new_x_index] = new_room
 
-    @abstractmethod
-    def to_graph(self):
-        pass
+            if not cap:
+                new_rooms.append((new_room, (new_x_index, new_y_index)))
 
-    @staticmethod
-    @abstractmethod
-    def from_graph(graph) -> 'AbstractLevel':
-        pass
+            new_x_index, new_y_index = x_index, y_index
 
+        for new_room, index in new_rooms:
+            self.add_rooms(new_room, index, treasure_probability, enemy_probability)
+        return
 
-class Level(AbstractLevel):
-    """
-    A level always has:
-    - 9 rooms (3x3 grid)
-        a room always has:
-        - 4 doors (n, s, e, w)
-            a door always has:
-            - a type
-        - a type
-    - 1 entrance
-    - 1 exit
-    - a route through the level
-    - all rooms connected
-    """
+    def draw(self):
+        dimension = LEVEL_LAYOUT_DIMENSION
+        level = []
+        for y in range(dimension):
+            group = [[], [], []]
+            for x in range(dimension):
+                room = self.level_layout[y][x]
+                if room is None:
+                    room = BLANK_ROOM_ASCII
+                else:
+                    room = room.draw()
+                group = [b[0] + b[1] for b in zip(group, room)]
+            level = level + group
 
-    def __init__(self, rooms: List[Room]):
-        self.rooms = rooms
-
-    def to_file(self, file_name: str = "level.json"):
-        pass
-
-    @staticmethod
-    def from_file(file_name: str = "level.json") -> 'Level':
-        pass
+        for x in level:
+            print(''.join(x))
 
     def to_graph(self):
         graph = nx.Graph()
@@ -154,94 +125,63 @@ class Level(AbstractLevel):
             room.add_to_graph(graph)
         return graph
 
+    def to_vector(self):
+        number_rooms = len(self.rooms) / LEVEL_MAX_NUMBER_OF_ROOMS
+        number_1_connection_rooms = self.number_x_connection_rooms(1) / LEVEL_MAX_NUMBER_OF_ROOMS
+        number_2_connection_rooms = self.number_x_connection_rooms(2) / LEVEL_MAX_NUMBER_OF_ROOMS
+        number_3_connection_rooms = self.number_x_connection_rooms(3) / LEVEL_MAX_NUMBER_OF_ROOMS
+
+        # could have treasure in every room but start room
+        number_treasures = len(self.treasures) / (LEVEL_MAX_NUMBER_OF_ROOMS - 1)
+
+        try:
+            average_treasure_value = mean([int(treasure.value) for treasure in self.treasures]) / int(
+                TreasureValue.HIGH)
+        except StatisticsError:
+            average_treasure_value = 0.
+
+        # can have up to 3 enemies per room
+        number_enemies = len(self.enemies) / ((LEVEL_MAX_NUMBER_OF_ROOMS - 1) * ENEMY_MAX_NUMBER_PER_ROOM)
+        try:
+            average_enemy_strength = mean([int(enemy.enemy_type) for enemy in self.enemies]) / int(EnemyType.STRONG)
+        except StatisticsError:
+            average_enemy_strength = 0.
+
+        graph = self.to_graph()
+
+        distance_start_exit = len(nx.shortest_path(graph, source=self.start_room.id, target=self.exit_room.id)) - 1
+
+        distances_rooms_to_start = [len(nx.shortest_path(graph, source=self.start_room.id, target=room.id)) - 1 for room
+                                    in self.rooms[1:]]
+        distance_start_furthest = max(distances_rooms_to_start)
+
+        distances_rooms_to_exit = [len(nx.shortest_path(graph, source=self.exit_room.id, target=room.id)) - 1 for room
+                                   in self.rooms[:-1]]
+        distance_exit_furthest = max(distances_rooms_to_exit)
+
+        loc = locals()
+        return dict([(i, loc[i]) for i in (
+            "number_rooms",
+            "number_1_connection_rooms",
+            "number_2_connection_rooms",
+            "number_3_connection_rooms",
+            "number_treasures",
+            "average_treasure_value",
+            "number_enemies",
+            "average_enemy_strength",
+            "distance_start_exit",
+            "distance_start_furthest",
+            "distance_exit_furthest",
+        )])
+
+    def number_x_connection_rooms(self, number_of_connections: int):
+        return len([room for room in self.rooms if room.number_of_connections == number_of_connections])
+
     @staticmethod
-    def from_graph(graph) -> 'Level':
-        pass
-
-    def to_dict(self):
-        level = {}
-        for room in self.rooms:
-            level['rooms'].append(room.to_dict())
-        return level
+    def _add_connection(room1, room2, direction):
+        room1.add_connection(room2, direction)
+        room2.add_connection(room1, direction.opposite())
 
     @staticmethod
-    def from_dict(graph) -> 'Level':
-        pass
-
-    def draw_level(self):
-        dimension = int(sqrt(len(self.rooms)))
-        level = []
-        for i in range(dimension):
-            group = [[], [], [], [], [], [], []]
-            for j in range(dimension):
-                index = i * dimension + j
-                room = self.rooms[index].draw()
-                group = [x[0] + x[1] for x in zip(group, room)]
-            level = group + level
-
-        for x in level:
-            print(''.join(x))
-
-
-def generate_level():
-    return basic_level()
-
-
-def basic_level():
-    """ Returns a basic level for proof of concept """
-    rooms = [Room(room_type=RoomType.ENTRANCE)] + [Room() for _ in range(7)] + [Room(room_type=RoomType.EXIT)]
-
-    rooms[0].add_entrance(Direction.SOUTH)
-    rooms[-1].add_exit(Direction.NORTH)
-
-    Room.connect_rooms(rooms[0], rooms[1], Direction.EAST, DoorType.ARCH)
-    Room.connect_rooms(rooms[1], rooms[2], Direction.EAST, DoorType.ARCH)
-
-    Room.connect_rooms(rooms[2], rooms[5], Direction.NORTH, DoorType.ARCH)
-
-    Room.connect_rooms(rooms[5], rooms[4], Direction.WEST, DoorType.ARCH)
-    Room.connect_rooms(rooms[4], rooms[3], Direction.WEST, DoorType.ARCH)
-
-    Room.connect_rooms(rooms[3], rooms[6], Direction.NORTH, DoorType.ARCH)
-
-    Room.connect_rooms(rooms[6], rooms[7], Direction.EAST, DoorType.ARCH)
-    Room.connect_rooms(rooms[7], rooms[8], Direction.EAST, DoorType.ARCH)
-
-    # Room.connect_rooms(rooms[0], rooms[3], Direction.NORTH, DoorType.ARCH)
-
-    return Level(rooms=rooms)
-
-
-def main():
-    level = generate_level()
-    level.draw_level()
-    graph = level.to_graph()
-    nx.write_graphml(graph, 'test_graph.xml')
-
-
-if __name__ == '__main__':
-    main()
-
-"""
-        N                N                N        
- |======D======|  |======D======|  |======D======| 
- |             |  |             |  |             | 
-WD   ROOM1234  DEWD   ROOM1234  DEWD   ROOM1234  DE
- |             |  |             |  |             | 
- |======D======|  |======D======|  |======D======| 
-        S                S                S        
-        N                N                N        
- |======D======|  |======D======|  |======D======| 
- |             |  |             |  |             | 
-WD   ROOM1234  DEWD   ROOM1234  DEWD   ROOM1234  DE
- |             |  |             |  |             | 
- |======D======|  |======D======|  |======D======| 
-        S                S                S        
-        N                N                N        
- |======D======|  |======D======|  |======D======| 
- |             |  |             |  |             | 
-WD   ROOM1234  DEWD   ROOM1234  DEWD   ROOM1234  DE
- |             |  |             |  |             | 
- |======D======|  |======D======|  |======D======| 
-        S                S                S        
-"""
+    def random_level_set(number_of_levels: int):
+        return [Level() for _ in range(number_of_levels)]
